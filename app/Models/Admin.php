@@ -15,6 +15,7 @@ class Admin extends Authenticatable
       'nama',
       'username',
       'password',
+      'foto',
    ];
 
    protected function nama(): Attribute

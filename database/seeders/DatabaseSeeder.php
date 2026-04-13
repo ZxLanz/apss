@@ -18,37 +18,26 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Admin
-        $admin = Admin::factory()->create([
-            'nama' => 'Administrator',
-            'username' => 'admin',
-        ]);
+        $admin = Admin::updateOrCreate(
+            ['username' => 'admin'],
+            [
+                'nama' => 'Administrator',
+                'password' => \Illuminate\Support\Facades\Hash::make('AdminSekolah123!')
+            ]
+        );
 
-        // Kategori
-        $kategori = Kategori::factory()
-            ->count(5)
-            ->create();
+        // Kategori - Common categories for school sarana/prasarana
+        $kategoris = [
+            'Bangunan & Gedung',
+            'Sarana Belajar',
+            'Elektronik & IT',
+            'Fasilitas Umum',
+            'Lainnya'
+        ];
 
-        // Siswa
-        $siswa = Siswa::factory()
-            ->count(10)
-            ->create();
+        foreach ($kategoris as $k) {
+            Kategori::updateOrCreate(['nama_kategori' => $k]);
+        }
 
-        // Laporan Pengaduan
-        $laporan = LaporanPengaduan::factory()
-            ->count(15)
-            ->make()
-            ->each(function ($laporan) use ($siswa, $kategori) {
-                $laporan->siswa_id = $siswa->random()->id;
-                $laporan->kategori_id = $kategori->random()->id;
-                $laporan->save();
-            });
-
-        // Aspirasi / Proses Admin
-        $laporan->each(function ($laporan) use ($admin) {
-            Aspirasi::factory()->create([
-                'laporan_id' => $laporan->id,
-                'admin_id' => $admin->id,
-            ]);
-        });
     }
 }

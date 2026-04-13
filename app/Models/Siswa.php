@@ -14,13 +14,24 @@ class Siswa extends Authenticatable
 
     protected $fillable = [
         'nis',
+        'password',
         'nama',
         'kelas',
+        'jurusan_id',
+        'foto',
     ];
 
     protected $hidden = [
+        'password',
         'remember_token',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+        ];
+    }
 
     protected function nama(): Attribute
     {
@@ -39,5 +50,10 @@ class Siswa extends Authenticatable
     public function laporan()
     {
         return $this->hasMany(LaporanPengaduan::class);
+    }
+
+    public function jurusan()
+    {
+        return $this->belongsTo(Jurusan::class, 'jurusan_id');
     }
 }

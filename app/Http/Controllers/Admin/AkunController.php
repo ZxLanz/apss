@@ -23,15 +23,30 @@ class AkunController extends Controller
 
         // Validasi input profil
         $request->validate([
-            'nama' => 'required|string',
+            'nama'     => 'required|string',
             'username' => 'required|string|max:50|unique:admins,username,' . $admin->id,
+            'foto'     => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Update data nama dan username
-        $admin->update([
-            'nama' => $request->nama,
+        $data = [
+            'nama'     => $request->nama,
             'username' => $request->username,
-        ]);
+        ];
+
+        // Penanganan Foto Profil
+        if ($request->hasFile('foto')) {
+            // Hapus foto lama jika ada di storage
+            if ($admin->foto && \Illuminate\Support\Facades\Storage::disk('public')->exists($admin->foto)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($admin->foto);
+            }
+
+            // Simpan foto baru
+            $path = $request->file('foto')->store('profile_pictures', 'public');
+            $data['foto'] = $path;
+        }
+
+        // Update data
+        $admin->update($data);
 
         return back()->with('success', 'Profil berhasil diperbarui');
     }

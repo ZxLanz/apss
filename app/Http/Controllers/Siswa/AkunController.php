@@ -21,19 +21,30 @@ class AkunController extends Controller
         $siswa = Auth::guard('siswa')->user();
 
         $request->validate([
-            'nis'   => 'required|unique:siswas,nis,' . $siswa->id,
             'nama'  => 'required|string|max:100',
             'kelas' => 'required|string|max:50',
+            'foto'  => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $siswa->update([
-            'nis'   => $request->input('nis'),
+        $data = [
             'nama'  => $request->input('nama'),
             'kelas' => $request->input('kelas'),
-        ]);
+        ];
+
+        if ($request->hasFile('foto')) {
+            // Hapus foto lama jika ada
+            if ($siswa->foto && \Illuminate\Support\Facades\Storage::disk('public')->exists($siswa->foto)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($siswa->foto);
+            }
+
+            $path = $request->file('foto')->store('profile_pictures', 'public');
+            $data['foto'] = $path;
+        }
+
+        $siswa->update($data);
 
         return redirect()
-            ->route('siswa.akun.edit')
+            ->route('siswa.dashboard')
             ->with('success', 'Data akun berhasil diperbarui');
     }
 }

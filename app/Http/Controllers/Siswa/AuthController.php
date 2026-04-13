@@ -16,22 +16,19 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'nis' => 'required',
+        $credentials = $request->validate([
+            'nis'      => 'required',
+            'password' => 'required'
         ]);
 
-        $siswa = Siswa::where('nis', $request->nis)->first();
-
-        if (!$siswa) {
-            return redirect()
-                ->route('siswa.register')
-                ->with('nis', $request->nis);
+        if (Auth::guard('siswa')->attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->route('siswa.dashboard');
         }
 
-        Auth::guard('siswa')->login($siswa);
-        $request->session()->regenerate();
-
-        return redirect()->route('siswa.dashboard');
+        return back()->withErrors([
+            'nis' => 'Kredensial yang diberikan tidak cocok dengan data kami.',
+        ])->onlyInput('nis');
     }
 
     public function logout(Request $request)
@@ -41,6 +38,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('siswa.login');
+        return redirect()->route('welcome');
     }
 }

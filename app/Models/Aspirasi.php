@@ -14,7 +14,26 @@ class Aspirasi extends Model
       'admin_id',
       'status',
       'feedback',
+      'keterangan',
+      'foto_perbaikan',
    ];
+
+   public static function getFeedbackLabels()
+   {
+       return [
+            1 => 'Tidak Puas',
+            2 => 'Kurang Puas',
+            3 => 'Cukup Puas',
+            4 => 'Puas',
+            5 => 'Sangat Puas',
+       ];
+   }
+
+   public function getFeedbackLabelAttribute()
+   {
+       if (!$this->feedback) return 'Belum ada feedback';
+       return self::getFeedbackLabels()[$this->feedback] ?? '-';
+   }
 
    public function laporan()
    {

@@ -14,6 +14,7 @@ class LaporanPengaduan extends Model
         'kategori_id',
         'ket',
         'lokasi',
+        'foto',
     ];
 
     public function siswa()
@@ -29,5 +30,10 @@ class LaporanPengaduan extends Model
     public function aspirasi()
     {
         return $this->hasOne(Aspirasi::class, 'laporan_id');
+    }
+
+    public function getStatusAttribute()
+    {
+        return $this->aspirasi?->status ?? 'menunggu';
     }
 }

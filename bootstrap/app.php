@@ -13,6 +13,15 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo(fn(Request $request) => route('welcome'));
+        $middleware->redirectUsersTo(function (Request $request) {
+            if ($request->is('portal-internal-smk-secure*')) {
+                return route('admin.dashboard');
+            }
+            if ($request->is('siswa*')) {
+                return route('siswa.dashboard');
+            }
+            return route('welcome');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

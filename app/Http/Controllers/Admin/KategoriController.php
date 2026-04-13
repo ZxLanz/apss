@@ -11,7 +11,7 @@ class KategoriController extends Controller
     public function index()
     {
         // Mengambil data kategori terbaru dengan paginasi 10 data per halaman
-        $kategori = Kategori::latest()->paginate(10);
+        $kategori = Kategori::withCount('laporan')->latest()->paginate(10);
         return view('admin.kategori.index', compact('kategori'));
     }
 
@@ -25,7 +25,7 @@ class KategoriController extends Controller
     {
         // Validasi input nama kategori
         $request->validate([
-            'nama_kategori' => 'required|string|max:100'
+            'nama_kategori' => 'required|string|max:100|unique:kategoris,nama_kategori'
         ]);
 
         // Menyimpan data kategori baru
@@ -51,7 +51,7 @@ class KategoriController extends Controller
     {
         // Validasi input saat update
         $request->validate([
-            'nama_kategori' => 'required|string|max:100'
+            'nama_kategori' => 'required|string|max:100|unique:kategoris,nama_kategori,' . $kategori->id
         ]);
 
         // Memperbarui data kategori

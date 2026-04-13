@@ -17,12 +17,13 @@ class SiswaFactory extends Factory
     public function definition(): array
     {
         return [
-            'nis' => $this->faker->unique()->numerify('##########'),
-            'nama' => $this->faker->name(),
-            'kelas' => $this->faker->randomElement([
-                'X PPLG 1',
-                'XI PPLG 1',
-                'XII PPLG 1',
+            'nis' => fake('id_ID')->unique()->numerify('1020##'),
+            'password' => \Illuminate\Support\Facades\Hash::make('password'),
+            'nama' => fake('id_ID')->name(),
+            'kelas' => fake('id_ID')->randomElement([
+                'X PPLG 1', 'X PPLG 2', 'X TKJ 1',
+                'XI PPLG 1', 'XI PPLG 2', 'XI TKJ 1',
+                'XII PPLG 1', 'XII PPLG 2', 'XII TKJ 1',
             ]),
         ];
     }
