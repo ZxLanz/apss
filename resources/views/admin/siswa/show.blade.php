@@ -31,6 +31,7 @@
     </script>
 </head>
 <body class="bg-surface font-body text-on-surface min-h-screen">
+    <x-admin.navbar active="siswa" />
     <div class="max-w-screen-xl mx-auto px-8 py-12">
         <div class="mb-10 flex items-center gap-4">
             <a href="{{ route('admin.siswa.index') }}" class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-outline hover:text-primary transition-all">

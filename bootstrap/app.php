@@ -12,6 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
         $middleware->redirectGuestsTo(fn(Request $request) => route('welcome'));
         $middleware->redirectUsersTo(function (Request $request) {
             if ($request->is('portal-internal-smk-secure*')) {

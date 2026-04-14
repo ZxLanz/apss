@@ -35,37 +35,7 @@
     </style>
 </head>
 <body class="bg-surface text-on-surface min-h-screen">
-<header class="bg-[#f6f9ff] dark:bg-slate-950 sticky top-0 z-50 shadow-sm">
-    <nav class="flex justify-between items-center px-8 py-4 w-full max-w-screen-2xl mx-auto">
-        <div class="flex items-center gap-8">
-            <span class="text-2xl font-bold tracking-tight text-[#0058be] dark:text-blue-400">APSS</span>
-            <div class="hidden md:flex items-center gap-6">
-                <a class="text-[#424754] dark:text-slate-400 font-medium hover:text-[#0058be] dark:hover:text-blue-300 transition-colors" href="{{ route('admin.dashboard') }}">Dashboard</a>
-                <a class="text-[#0058be] dark:text-blue-400 font-bold border-b-2 border-[#0058be] pb-1" href="{{ route('admin.siswa.index') }}">Siswa</a>
-                <a class="text-[#424754] dark:text-slate-400 font-medium hover:text-[#0058be] dark:hover:text-blue-300 transition-colors" href="{{ route('admin.kategori.index') }}">Kategori</a>
-                <a class="text-[#424754] dark:text-slate-400 font-medium hover:text-[#0058be] dark:hover:text-blue-300 transition-colors" href="{{ route('admin.laporan.index') }}">Laporan & Aspirasi</a>
-            </div>
-        </div>
-        <div class="flex items-center gap-4">
-            <a href="{{ route('admin.akun') }}" class="flex items-center gap-3 pr-4 border-r border-surface-variant group">
-                <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary transition-colors group-hover:text-white overflow-hidden ring-1 ring-black/5">
-                    @if(Auth::guard('admin')->user()->foto)
-                        <img src="{{ asset('storage/' . Auth::guard('admin')->user()->foto) }}" class="w-full h-full object-cover">
-                    @else
-                        <span class="material-symbols-outlined">shield_person</span>
-                    @endif
-                </div>
-            </a>
-            <form action="{{ route('admin.logout') }}" method="POST" id="form-logout">
-                @csrf
-                <button type="button" onclick="confirmLogout()" class="text-slate-500 hover:text-error flex items-center gap-1 text-sm font-medium transition-colors">
-                    <span class="material-symbols-outlined text-lg">logout</span>
-                    Logout
-                </button>
-            </form>
-        </div>
-    </nav>
-</header>
+<x-admin.navbar active="siswa" />
 
 <main class="max-w-screen-2xl mx-auto px-8 py-8">
     @if(session('success'))
@@ -90,9 +60,13 @@
                 <p class="text-on-surface-variant max-w-2xl">Kelola data siswa yang terdaftar di aplikasi APSS.</p>
             </div>
             <div class="flex items-center gap-3 flex-wrap justify-end">
+                <a href="{{ route('admin.siswa.export') }}" class="bg-surface-container-high text-on-surface font-semibold px-6 py-3 rounded-lg text-sm shadow-md hover:bg-surface-container-highest transition-all flex items-center gap-2 w-fit">
+                    <span class="material-symbols-outlined text-lg">download_for_offline</span>
+                    Export Data
+                </a>
                 <button onclick="openImportModal()" class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg text-sm shadow-md hover:bg-blue-700 transition-all flex items-center gap-2 w-fit">
                     <span class="material-symbols-outlined text-lg">upload_file</span>
-                    Import Excel/CSV
+                    Import Data
                 </button>
                 <a href="{{ route('admin.siswa.create') }}" class="signature-gradient text-white font-semibold px-6 py-3 rounded-lg text-sm shadow-md hover:scale-[0.98] transition-transform flex items-center gap-2 w-fit">
                     <span class="material-symbols-outlined text-lg">person_add</span>

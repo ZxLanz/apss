@@ -148,8 +148,8 @@ Route::prefix(config('admin.prefix'))->name('admin.')->group(function () {
         Route::get('laporan/export', [LaporanAspirasiController::class, 'exportExcel'])->name('laporan.export');
         Route::resource('laporan', LaporanAspirasiController::class)
         ->only(['index', 'show', 'update']);
+        Route::get('siswa/export', [SiswaController::class, 'export'])->name('siswa.export');
         Route::post('siswa/import', [SiswaController::class, 'import'])->name('siswa.import');
-        Route::get('siswa/download-template', [SiswaController::class, 'downloadTemplate'])->name('siswa.downloadTemplate');
         Route::resource('siswa', SiswaController::class);
     });
 });

@@ -37,36 +37,7 @@
     </style>
 </head>
 <body class="bg-surface font-body text-on-surface min-h-screen flex flex-col">
-<header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-surface-variant/10">
-    <nav class="flex justify-between items-center px-8 h-16 w-full max-w-screen-2xl mx-auto">
-        <div class="flex items-center gap-8">
-            <div class="text-2xl font-black tracking-tight text-blue-800 font-headline">APSS</div>
-            <div class="hidden md:flex gap-6 items-center">
-                <a class="text-slate-500 font-medium hover:text-primary transition-colors" href="{{ route('admin.dashboard') }}">Dashboard</a>
-                <a class="text-slate-500 font-medium hover:text-primary transition-colors" href="{{ route('admin.kategori.index') }}">Kategori</a>
-                <a class="text-slate-500 font-medium hover:text-primary transition-colors" href="{{ route('admin.laporan.index') }}">Laporan</a>
-            </div>
-        </div>
-        <div class="flex items-center gap-4">
-            <a href="{{ route('admin.akun') }}" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10 text-primary transition-all shadow-sm group">
-                <div class="w-8 h-8 rounded-lg overflow-hidden bg-primary text-white flex items-center justify-center border border-white/50">
-                    @if($admin->foto)
-                        <img src="{{ asset('storage/' . $admin->foto) }}" class="w-full h-full object-cover">
-                    @else
-                        <span class="material-symbols-outlined text-[20px]">shield_person</span>
-                    @endif
-                </div>
-                <span class="text-sm font-bold hidden md:block tracking-tight text-primary">{{ Auth::guard('admin')->user()->nama }}</span>
-            </a>
-            <form action="{{ route('admin.logout') }}" method="POST" id="form-logout">
-                @csrf
-                <button type="button" onclick="confirmLogout()" class="text-slate-500 hover:text-error transition-colors flex items-center justify-center p-2 rounded-lg hover:bg-rose-50">
-                    <span class="material-symbols-outlined">logout</span>
-                </button>
-            </form>
-        </div>
-    </nav>
-</header>
+<x-admin.navbar active="" />
 
 <main class="max-w-screen-xl mx-auto px-8 py-12 flex-grow w-full">
     <div class="mb-12 text-center lg:text-left">

@@ -8,6 +8,8 @@ use App\Models\Jurusan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class SiswaController extends Controller
 {
@@ -152,19 +154,59 @@ class SiswaController extends Controller
             ->with('success', 'Data siswa berhasil dihapus.');
     }
 
+    public function export()
+    {
+        $siswa = Siswa::with('jurusan')->latest()->get();
+        
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        // Set Header
+        $sheet->setCellValue('A1', 'NIS');
+        $sheet->setCellValue('B1', 'Nama');
+        $sheet->setCellValue('C1', 'Kelas');
+        $sheet->setCellValue('D1', 'Jurusan');
+        $sheet->setCellValue('E1', 'Tanggal Terdaftar');
+        
+        // Style Header
+        $sheet->getStyle('A1:E1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:E1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFD3D3D3');
+
+        // Add Data
+        $row = 2;
+        foreach ($siswa as $item) {
+            $sheet->setCellValue('A' . $row, $item->nis);
+            $sheet->setCellValue('B' . $row, $item->nama);
+            $sheet->setCellValue('C' . $row, $item->kelas);
+            $sheet->setCellValue('D' . $row, $item->jurusan?->nama_jurusan ?? '-');
+            $sheet->setCellValue('E' . $row, $item->created_at->format('d/m/Y H:i'));
+            $row++;
+        }
+
+        // Auto size columns
+        foreach (range('A', 'E') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $filename = "Data_Siswa_APSS_" . date('Ymd_His') . ".xlsx";
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save('php://output');
+        exit;
+    }
+
     public function downloadTemplate()
     {
         $filename = "Template_Import_Siswa_" . date('Ymd_His') . ".csv";
         
         // Create CSV content with proper formatting
-        $output = "NIS,Nama,Kelas,Jurusan ID,Email\n";
-        $output .= "75323623,Syarahatu Milkiyyah,XII BC A,1,ahmad@example.com\n";
-        $output .= "96900874,Syifa Febriani,XII BC A,2,budi@example.com\n";
-        $output .= "86592792,Taurina Azzahra,XII BC A,3,citra@example.com\n";
-        $output .= "82222939,Tia Ramadani,XII BC A,4,\n";
-        $output .= "87158319,Wafiq Azizah,XII BC A,5,\n";
-        $output .= "82621994,Wira Wardana,XII BC A,6,\n";
-        $output .= "89543244,Wisnu Hidayat,XII BC A,7,\n";
+        $output = "NIS,Nama,Kelas,Jurusan_ID\n";
+        $output .= "75323623,Syarahatu Milkiyyah,XII,1\n";
+        $output .= "96900874,Syifa Febriani,XII,2\n";
         
         header('Content-Type: text/csv; charset=UTF-8');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
@@ -185,96 +227,59 @@ class SiswaController extends Controller
 
         try {
             $file = $request->file('file');
-            $data = [];
+            $spreadsheet = IOFactory::load($file->getRealPath());
+            $worksheet = $spreadsheet->getActiveSheet();
+            $rows = $worksheet->toArray();
+            
+            // Remove header
+            array_shift($rows);
 
-            // Handle Excel by reading as CSV
-            if (in_array($file->getClientOriginalExtension(), ['xlsx', 'xls'])) {
-                // For Excel files, try to read as CSV-like structure
-                if (($handle = fopen($file->getRealPath(), "r")) !== false) {
-                    // Skip header
-                    $header = fgetcsv($handle);
-                    
-                    while (($row = fgetcsv($handle)) !== false) {
-                        if (!empty($row[0]) && !empty($row[1]) && !empty($row[2])) {
-                            // Extract kelas prefix from full format (e.g., "XII BC A" -> "XII")
-                            $kelasRaw = trim($row[2]);
-                            $kelasPrefix = explode(' ', $kelasRaw)[0]; // Get first part before space
-                            
-                            $data[] = [
-                                'nis' => trim($row[0]),
-                                'nama' => trim($row[1]),
-                                'kelas' => $kelasPrefix,
-                                'jurusan_id' => !empty($row[3]) ? (int)$row[3] : null,
-                                'email' => !empty($row[4]) ? trim($row[4]) : null,
-                            ];
-                        }
-                    }
-                    fclose($handle);
-                }
-            } else {
-                // Handle CSV
-                if (($handle = fopen($file->getRealPath(), "r")) !== false) {
-                    // Skip header
-                    $header = fgetcsv($handle);
-                    
-                    while (($row = fgetcsv($handle)) !== false) {
-                        if (!empty($row[0]) && !empty($row[1]) && !empty($row[2])) {
-                            // Extract kelas prefix from full format (e.g., "XII BC A" -> "XII")
-                            $kelasRaw = trim($row[2]);
-                            $kelasPrefix = explode(' ', $kelasRaw)[0]; // Get first part before space
-                            
-                            $data[] = [
-                                'nis' => trim($row[0]),
-                                'nama' => trim($row[1]),
-                                'kelas' => $kelasPrefix,
-                                'jurusan_id' => !empty($row[3]) ? (int)$row[3] : null,
-                                'email' => !empty($row[4]) ? trim($row[4]) : null,
-                            ];
-                        }
-                    }
-                    fclose($handle);
-                }
-            }
-
-            if (empty($data)) {
+            if (empty($rows)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'File tidak memiliki data atau format tidak sesuai.'
                 ], 422);
             }
 
-            // Import data
             $imported = 0;
             $errors = [];
 
-            foreach ($data as $index => $row) {
+            foreach ($rows as $index => $row) {
+                // Skip empty rows
+                if (empty($row[0]) || empty($row[1]) || empty($row[2])) continue;
+
                 try {
+                    $nis = trim($row[0]);
+                    $nama = trim($row[1]);
+                    $kelasRaw = trim($row[2]);
+                    
+                    // Clean up kelas (e.g., "XII BC A" -> "XII")
+                    $kelasPrefix = strtoupper(explode(' ', $kelasRaw)[0]);
+
                     // Check if NIS already exists
-                    if (Siswa::where('nis', $row['nis'])->exists()) {
-                        $errors[] = "Baris " . ($index + 2) . ": NIS {$row['nis']} sudah terdaftar.";
+                    if (Siswa::where('nis', $nis)->exists()) {
+                        $errors[] = "Baris " . ($index + 2) . ": NIS {$nis} sudah terdaftar.";
                         continue;
                     }
 
-                    // Validate kelas - must be X, XI, XII, or XIII
-                    if (!in_array($row['kelas'], ['X', 'XI', 'XII', 'XIII'])) {
-                        $errors[] = "Baris " . ($index + 2) . ": Kelas '{$row['kelas']}' tidak valid.";
+                    // Validate kelas
+                    if (!in_array($kelasPrefix, ['X', 'XI', 'XII', 'XIII'])) {
+                        $errors[] = "Baris " . ($index + 2) . ": Kelas '{$kelasPrefix}' tidak valid. Harus X, XI, XII, atau XIII.";
                         continue;
                     }
 
-                    // Validate jurusan_id if provided
-                    if ($row['jurusan_id'] && !Jurusan::where('id', $row['jurusan_id'])->exists()) {
-                        $errors[] = "Baris " . ($index + 2) . ": Jurusan ID {$row['jurusan_id']} tidak ditemukan.";
+                    $jurusan_id = !empty($row[3]) ? (int)$row[3] : null;
+                    if ($jurusan_id && !Jurusan::where('id', $jurusan_id)->exists()) {
+                        $errors[] = "Baris " . ($index + 2) . ": Jurusan ID {$jurusan_id} tidak ditemukan.";
                         continue;
                     }
 
-                    // Create siswa with default password
                     Siswa::create([
-                        'nis' => $row['nis'],
-                        'nama' => $row['nama'],
-                        'kelas' => $row['kelas'],
-                        'jurusan_id' => $row['jurusan_id'],
-                        'email' => $row['email'],
-                        'password' => Hash::make($row['nis']), // Default password is NIS
+                        'nis' => $nis,
+                        'nama' => $nama,
+                        'kelas' => $kelasPrefix,
+                        'jurusan_id' => $jurusan_id,
+                        'password' => Hash::make($nis), // Default password is NIS
                     ]);
 
                     $imported++;

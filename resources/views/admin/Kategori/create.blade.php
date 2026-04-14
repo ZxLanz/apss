@@ -33,31 +33,7 @@
     </style>
 </head>
 <body class="bg-surface font-body text-on-surface min-h-screen flex flex-col">
-<header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-surface-variant/10">
-    <nav class="flex justify-between items-center px-8 h-16 w-full max-w-screen-2xl mx-auto">
-        <div class="flex items-center gap-8">
-            <div class="text-2xl font-black tracking-tight text-blue-800 font-headline">APSS</div>
-            <div class="hidden md:flex gap-6 items-center">
-                <a class="text-slate-500 font-medium hover:text-primary transition-colors" href="{{ route('admin.dashboard') }}">Dashboard</a>
-                <a class="text-slate-500 font-medium hover:text-primary transition-colors" href="{{ route('admin.siswa.index') }}">Siswa</a>
-                <a class="text-primary font-bold border-b-2 border-primary pb-1" href="{{ route('admin.kategori.index') }}">Kategori</a>
-                <a class="text-slate-500 font-medium hover:text-primary transition-colors" href="{{ route('admin.laporan.index') }}">Laporan</a>
-            </div>
-        </div>
-        <div class="flex items-center gap-4">
-            <a href="{{ route('admin.akun') }}" class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition-colors group">
-                <div class="w-8 h-8 rounded-lg overflow-hidden bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-sm ring-1 ring-black/5">
-                    @if(Auth::guard('admin')->user()->foto)
-                        <img src="{{ asset('storage/' . Auth::guard('admin')->user()->foto) }}" class="w-full h-full object-cover">
-                    @else
-                        <span class="material-symbols-outlined text-[20px]">shield_person</span>
-                    @endif
-                </div>
-                <span class="text-sm font-bold text-on-surface-variant group-hover:text-primary">{{ Auth::guard('admin')->user()->nama }}</span>
-            </a>
-        </div>
-    </nav>
-</header>
+<x-admin.navbar active="kategori" />
 
 <main class="max-w-xl mx-auto px-6 py-12 flex-grow w-full">
     <div class="mb-8 flex items-center gap-4">

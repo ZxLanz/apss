@@ -98,66 +98,7 @@
     </style>
 </head>
 <body class="bg-surface text-on-surface min-h-screen">
-<header class="bg-[#f6f9ff] dark:bg-slate-950 sticky top-0 z-50 shadow-sm">
-    <nav class="flex justify-between items-center px-8 py-4 w-full max-w-screen-2xl mx-auto">
-        <div class="flex items-center gap-8">
-            <span class="text-2xl font-bold tracking-tight text-[#0058be] dark:text-blue-400">APSS</span>
-            <div class="hidden md:flex items-center gap-6">
-                <a class="text-[#424754] dark:text-slate-400 font-medium hover:text-[#0058be] dark:hover:text-blue-300 transition-colors" href="{{ route('admin.dashboard') }}">Dashboard</a>
-                <a class="text-[#424754] dark:text-slate-400 font-medium hover:text-[#0058be] dark:hover:text-blue-300 transition-colors" href="{{ route('admin.siswa.index') }}">Siswa</a>
-                <a class="text-[#424754] dark:text-slate-400 font-medium hover:text-[#0058be] dark:hover:text-blue-300 transition-colors" href="{{ route('admin.kategori.index') }}">Kategori</a>
-                <a class="text-[#0058be] dark:text-blue-400 font-bold border-b-2 border-[#0058be] pb-1" href="{{ route('admin.laporan.index') }}">Laporan & Aspirasi</a>
-            </div>
-        </div>
-        <div class="flex items-center gap-4">
-            <a href="{{ route('admin.akun') }}" class="flex items-center gap-3 pr-4 border-r border-surface-variant group">
-                <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary transition-colors group-hover:text-white overflow-hidden ring-1 ring-black/5">
-                    @if(Auth::guard('admin')->user()->foto)
-                        <img src="{{ asset('storage/' . Auth::guard('admin')->user()->foto) }}" class="w-full h-full object-cover">
-                    @else
-                        <span class="material-symbols-outlined">shield_person</span>
-                    @endif
-                </div>
-            </a>
-            <form action="{{ route('admin.logout') }}" method="POST" id="form-logout">
-                @csrf
-                <button type="button" onclick="confirmLogout()" class="text-slate-500 hover:text-error flex items-center gap-1 text-sm font-medium transition-colors">
-                    <span class="material-symbols-outlined text-lg">logout</span>
-                    Logout
-                </button>
-            </form>
-            <script>
-                function confirmLogout() {
-                    Swal.fire({
-                        title: 'Keluar dari Sistem?',
-                        text: 'Sesi anda sebagai administrator akan diakhiri.',
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#ba1a1a',
-                        cancelButtonColor: '#727785',
-                        confirmButtonText: 'Ya, Logout',
-                        cancelButtonText: 'Batal'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            document.getElementById('form-logout').submit();
-                        }
-                    })
-                }
-
-                // Auto-hide toast after 3 seconds
-                setTimeout(() => {
-                    const toast = document.getElementById('toast-success');
-                    if (toast) {
-                        toast.style.transition = 'all 0.5s ease';
-                        toast.style.opacity = '0';
-                        toast.style.transform = 'translateY(-20px)';
-                        setTimeout(() => toast.remove(), 500);
-                    }
-                }, 3000);
-            </script>
-        </div>
-    </nav>
-</header>
+<x-admin.navbar active="laporan" />
 <main class="max-w-screen-2xl mx-auto px-8 py-8">
 @if(session('success'))
 <div class="fixed top-6 right-6 z-[60] flex items-center gap-3 bg-surface-container-lowest border-l-4 border-primary px-6 py-4 rounded-xl shadow-lg ring-1 ring-black/5" id="toast-success">
